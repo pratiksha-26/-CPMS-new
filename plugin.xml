@@ -2,22 +2,18 @@
 <plugin
     xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.megster.cordova.ble"
-    version="0.1.2">
+    id="cordova-plugin-ble-central"
+    version="1.4.5">
 
     <name>BLE</name>
-    <description>Bluetooth Low Energy (BLE) Central Plugin (iOS only version for OutSystems)</description>
+    <description>Bluetooth Low Energy (BLE) Central Plugin</description>
     <license>Apache 2.0</license>
-    <keywords>bluetooth, BLE, bluetooth low energy</keywords>
+    <keywords>bluetooth, BLE, bluetooth low energy, bluetooth smart</keywords>
 
     <repo>https://github.com/don/cordova-plugin-ble-central.git</repo>
     <issue>https://github.com/don/cordova-plugin-ble-central/issues</issue>
 
-    <engines>
-        <engine name="cordova" version=">=3.1.0" />
-    </engines>
-
-    <!-- Removed cordova-plugin-compat dependency -->
+    <!-- Removed deprecated cordova-plugin-compat dependency -->
 
     <js-module src="www/ble.js" name="ble">
         <clobbers target="ble" />
@@ -25,10 +21,9 @@
 
     <!-- iOS platform configuration -->
     <platform name="ios">
-
         <config-file target="config.xml" parent="/widget">
             <feature name="BLE">
-                <param name="ios-package" value="BLECentralPlugin" onload="true"/>
+                <param name="ios-package" value="BLECentralPlugin" onload="true" />
             </feature>
         </config-file>
 
@@ -38,21 +33,51 @@
         <header-file src="src/ios/CBPeripheral+Extensions.h" target-dir="BLECentralPlugin" />
         <source-file src="src/ios/CBPeripheral+Extensions.m" target-dir="BLECentralPlugin" />
 
-        <header-file src="src/ios/Foo.h" target-dir="BLECentralPlugin" />
-        <source-file src="src/ios/Foo.m" target-dir="BLECentralPlugin" />
+        <header-file src="src/ios/BLECommandContext.h" target-dir="BLECentralPlugin" />
+        <source-file src="src/ios/BLECommandContext.m" target-dir="BLECentralPlugin" />
 
-        <!-- Required iOS framework -->
+        <!-- frameworks -->
         <framework src="CoreBluetooth.framework" />
+
+        <!-- iOS permissions -->
+        <preference name="BLUETOOTH_USAGE_DESCRIPTION" default="This app uses Bluetooth to connect to devices." />
+        <preference name="BLUETOOTH_ALWAYS_USAGE_DESCRIPTION" default="This app uses Bluetooth to connect to devices even in the background." />
+
+        <config-file target="*-Info.plist" parent="NSBluetoothPeripheralUsageDescription">
+            <string>$BLUETOOTH_USAGE_DESCRIPTION</string>
+        </config-file>
+        <config-file target="*-Info.plist" parent="NSBluetoothAlwaysUsageDescription">
+            <string>$BLUETOOTH_ALWAYS_USAGE_DESCRIPTION</string>
+        </config-file>
     </platform>
 
-    <!-- Dummy Android platform configuration -->
+    <!-- Android platform configuration -->
     <platform name="android">
-        <config-file target="config.xml" parent="/widget">
-            <feature name="BLE" />
+        <config-file target="res/xml/config.xml" parent="/widget">
+            <feature name="BLE">
+                <param name="android-package" value="com.megster.cordova.ble.central.BLECentralPlugin" />
+            </feature>
         </config-file>
 
-        <!-- No Android source files or permissions.
-             This section exists only to prevent MABS validation errors. -->
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.BLUETOOTH" />
+            <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+            <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+            <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+        </config-file>
+
+        <source-file src="src/android/BLECentralPlugin.java" target-dir="src/com/megster/cordova/ble/central" />
+        <source-file src="src/android/BLECommand.java" target-dir="src/com/megster/cordova/ble/central" />
+        <source-file src="src/android/Peripheral.java" target-dir="src/com/megster/cordova/ble/central" />
+        <source-file src="src/android/Helper.java" target-dir="src/com/megster/cordova/ble/central" />
+        <source-file src="src/android/UUIDHelper.java" target-dir="src/com/megster/cordova/ble/central" />
     </platform>
 
+    <!-- Browser fallback -->
+    <platform name="browser">
+        <js-module src="src/browser/BLECentralPlugin.js" name="BLECentralPlugin">
+            <merges target="ble" />
+        </js-module>
+    </platform>
 </plugin>
